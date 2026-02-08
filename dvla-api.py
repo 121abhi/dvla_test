@@ -44,9 +44,8 @@ class PromptRequest(BaseModel):
 
 
 class PromptResponse(BaseModel):
-    output: str
-    intermediate_steps: List[Dict[str, Any]]
-    session_id: str
+    sessionId: str
+    message: str
 
 
 class HealthResponse(BaseModel):
@@ -188,9 +187,8 @@ async def chat(request: PromptRequest):
             })
         
         return {
-            "output": response["output"],
-            "intermediate_steps": formatted_steps,
-            "session_id": request.session_id
+            "sessionId": request.session_id,
+            "message": response["output"]
         }
         
     except HTTPException:
@@ -231,7 +229,6 @@ async def delete_session(session_id: str):
         return {"message": f"Session '{session_id}' has been deleted"}
     raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found")
 
-
 if __name__ == "__main__":
     import uvicorn
     
@@ -242,4 +239,7 @@ if __name__ == "__main__":
     print(f"HF_TOKEN set: {bool(os.getenv('HF_TOKEN'))}")
     print("=" * 60)
     
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
